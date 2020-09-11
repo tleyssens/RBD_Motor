@@ -12,6 +12,7 @@ namespace RBD {
   : _timer() {
     _pwm_pin       = pwm_pin;
     _bidirectional = false;
+    _directionPin  = false;
     pinMode(_pwm_pin, OUTPUT);
   }
 
@@ -22,9 +23,21 @@ namespace RBD {
     _forward_pin    = forward_pin;
     _reverse_pin    = reverse_pin;
     _bidirectional  = true;
+    _directionPin   = false;
     pinMode(_pwm_pin, OUTPUT);
     pinMode(_forward_pin, OUTPUT);
     pinMode(_reverse_pin, OUTPUT);
+    forward();
+  }
+  // overloaded construcor with forward_pin as direction pin
+  Motor::Motor(int pwm_pin, int forward_pin)
+  : _timer() {
+    _pwm_pin        = pwm_pin;
+    _forward_pin    = forward_pin; //direction true = forward ; false = reverse
+    _bidirectional  = true;
+    _directionPin   = true
+    pinMode(_pwm_pin, OUTPUT);
+    pinMode(_forward_pin, OUTPUT);
     forward();
   }
 
@@ -40,7 +53,9 @@ namespace RBD {
     if(_bidirectional) {
       _is_forward = true;
       off();
-      digitalWrite(_reverse_pin, LOW);
+      if(!_directionPin) {
+        digitalWrite(_reverse_pin, LOW);
+      }
       digitalWrite(_forward_pin, HIGH);
     }
   }
@@ -50,7 +65,9 @@ namespace RBD {
       _is_forward = false;
       off();
       digitalWrite(_forward_pin, LOW);
-      digitalWrite(_reverse_pin, HIGH);
+      if(!_directionPin) {
+        digitalWrite(_reverse_pin, HIGH);
+      }
     }
   }
 
